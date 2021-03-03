@@ -1,4 +1,5 @@
 package ru.javawebinar.topjava.model;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -6,14 +7,14 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @NamedQueries({
-        @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.user.id=:userId"),
-        @NamedQuery(name = Meal.ALL_SORTED, query = "SELECT m FROM Meal m LEFT JOIN FETCH m.user.id ORDER BY m.dateTime"),
-        @NamedQuery(name = Meal.BY_ID, query = "SELECT m FROM Meal m LEFT JOIN FETCH m.user.id WHERE m.user.id=:userId"),
-        @NamedQuery(name = Meal.BY_BETWEEN_HALF_OPEN, query = "SELECT m FROM Meal m WHERE m.user.id=:userId AND m.dateTime >=: dateTime AND m.dateTime <: dateTime " +
-                "ORDER BY m.dateTime asc"),
+        @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.id=:id"),
+        @NamedQuery(name = Meal.ALL_SORTED, query = "SELECT m FROM Meal m LEFT JOIN FETCH m.user WHERE m.user.id=?1 ORDER BY m.dateTime"),
+//        @NamedQuery(name = Meal.BY_ID, query = "SELECT m FROM Meal m LEFT JOIN FETCH m.user.id WHERE m.id=:id"),
+//        @NamedQuery(name = Meal.BY_BETWEEN_HALF_OPEN, query = "SELECT m FROM Meal m WHERE m.user.id=:userId AND m.dateTime >=: dateTime AND m.dateTime <: dateTime " +
+//                "ORDER BY m.dateTime asc"),
 })
 @Entity
-@Table(name = "meals", uniqueConstraints = {@UniqueConstraint(columnNames = "id", name = "meals_unique_user_datetime_idx")})
+@Table(name = "meals", uniqueConstraints = {@UniqueConstraint(columnNames = "user_id", name = "meals_unique_user_datetime_idx")})
 public class Meal extends AbstractBaseEntity {
 
     public static final String DELETE = "Meal.delete";
@@ -28,15 +29,16 @@ public class Meal extends AbstractBaseEntity {
     @NotNull
     private LocalDateTime dateTime;
 
-    @Column(name = "description", nullable = false, columnDefinition = "timestamp default now()")
+    @Column(name = "description", nullable = false, columnDefinition = "")
     @NotNull
     private String description;
 
-    @Column(name = "calories", nullable = false, columnDefinition = "timestamp default now()")
+    @Column(name = "calories", nullable = false, columnDefinition = "")
     @NotNull
     private Integer calories;
 
-    public Meal(){}
+    public Meal() {
+    }
 
     public Meal(LocalDateTime dateTime, String description, int calories) {
         this(null, dateTime, description, calories);
@@ -44,6 +46,7 @@ public class Meal extends AbstractBaseEntity {
 
     public Meal(Integer id, LocalDateTime dateTime, String description, int calories) {
         super(id);
+//        this.userId = userId;
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
