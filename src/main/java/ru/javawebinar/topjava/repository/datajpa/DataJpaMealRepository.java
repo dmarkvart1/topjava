@@ -6,6 +6,7 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,9 +21,10 @@ public class DataJpaMealRepository implements MealRepository {
 
     @Override
     public Meal save(Meal meal, int userId) {
-        meal.setUser(crudRepository.getOne(meal, userId));
+        meal.setUser(crudRepository.getByUser(userId));
         if (meal.isNew()) {
-            return crudRepository.save(meal);
+            crudRepository.save(meal);
+            return meal;
         } else if (get(meal.id(), userId) == null) {
             return null;
         }
@@ -31,21 +33,21 @@ public class DataJpaMealRepository implements MealRepository {
 
     @Override
     public boolean delete(int id, int userId) {
-        return crudRepository.delete(id, userId) != 0;
+        return crudRepository.deleteByIdAndUserId(id, userId) != 0;
     }
 
     @Override
     public Meal get(int id, int userId) {
-        return crudRepository.findById(id, userId).orElse(null);
+        return crudRepository.getOne(id, userId);
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return crudRepository.findAll(Sort.by(Sort.Direction.DESC, "date_time"));
+        return crudRepository.getAll(userId);
     }
 
     @Override
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
-        return crudRepository.findAll(startDateTime, endDateTime, userId);
+        return crudRepository.findByBetween(startDateTime, endDateTime, userId);
     }
 }

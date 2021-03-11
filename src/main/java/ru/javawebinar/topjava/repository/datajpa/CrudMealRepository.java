@@ -1,36 +1,46 @@
 package ru.javawebinar.topjava.repository.datajpa;
 
+import org.hibernate.type.LocalDateTimeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Transactional(readOnly = true)
 public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
+    @Transactional
+    @Query("SELECT u FROM User u WHERE u.id=:id")
+    User getByUser(@Param("id") int id);
 
     @Transactional
-    @Modifying
-    @Query("UPDATE Meal m SET m.dateTime = :datetime, m.calories= :calories, m.description=:desc WHERE m.id=:id and m.user.id=:userId")
-    User getOne(Meal meal, int userId);
+    @Query("SELECT m FROM Meal m WHERE m.id=:id AND m.user.id=:userId")
+    Meal getOne(
+            @Param("id") int id,
+            @Param("userId") int userId);
 
     @Transactional
     @Modifying
     @Query("DELETE FROM Meal m WHERE m.id=:id AND m.user.id=:userId")
-    int delete(int id, int userId);
+    int deleteByIdAndUserId(
+            @Param("id") int id,
+            @Param("userId") int userId);
 
     @Transactional
-    @Modifying
-    @Query("SELECT m FROM Meal m WHERE m.id=:id AND m.user.id=:userId")
-    Optional<Meal> findById(int id, int userId);
+    @Query("SELECT m FROM Meal m WHERE m.user.id=:userId")
+    List<Meal>  getAll(
+            @Param("userId") int userId);
+
 
     @Transactional
-    @Modifying
-    @Query("SELECT m FROM Meal m WHERE m.user.id=:userId AND m.dateTime >= :startDateTime AND m.dateTime < :endDateTime ORDER BY m.dateTime DESC")
-    List<Meal> findAll(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId);
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH.mm")
+    @Query("SELECT m FROM Meal m WHERE m.user.id=?3 AND m.dateTime >= ?1 AND m.dateTime < ?2 ORDER BY m.dateTime DESC")
+    List<Meal> findByBetween(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId);
 }
