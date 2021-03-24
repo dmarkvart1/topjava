@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 
 @Controller
-public class JspMealController extends MealAbstractController{
+public class JspMealController extends AbstractMealController {
 
     @GetMapping("/meals")
     public String getMeals(Model model) {

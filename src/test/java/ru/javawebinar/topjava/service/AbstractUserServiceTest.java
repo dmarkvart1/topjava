@@ -24,22 +24,21 @@ import static ru.javawebinar.topjava.UserTestData.*;
 
 public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     @Autowired
-    private Environment environment;
+    private  Environment environment;
 
     @Autowired
     protected UserService service;
 
     @Autowired
-    private CacheManager cacheManager;
+    private  CacheManager cacheManager;
 
     @Autowired(required = false)
-    protected JpaUtil jpaUtil;
+    protected  JpaUtil jpaUtil;
 
     @Before
     public void setup() {
-        Assume.assumeTrue(isJdbcProfileActive());
+        Assume.assumeTrue(!isJdbcProfileActive());
     }
-
     private boolean isJdbcProfileActive() {
         if (Arrays.asList(environment.getActiveProfiles()).contains("jdbc")) {
             return true;
@@ -48,7 +47,6 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
         jpaUtil.clear2ndLevelHibernateCache();
         return false;
     }
-
 
     @Test
     public void create() {
